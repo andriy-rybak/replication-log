@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+ 
+package leader_node;
+
+service LeaderService {
+    rpc RegisterFollower (RegistrationReq) returns (RegistrationResp) {}
+    rpc GetFollowers (Empty) returns (FollowerList) {}
+}
+
+message Follower {
+    string id = 1;
+    string registeredAt = 2;
+    string url = 3;
+    int32 port = 4;
+}
+
+message FollowerList {
+    repeated Follower followers = 1;
+}
+ 
+message RegistrationReq {
+    string url = 1;
+    int32 port = 2;
+}
+
+message RegistrationResp {
+    bool success = 1;
+}

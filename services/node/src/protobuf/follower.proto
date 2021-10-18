@@ -1,0 +1,17 @@
+syntax = "proto3";
+ 
+package follower_node;
+ 
+service FollowerService {
+    rpc Append (AppendReq) returns (AppendResp) {}
+}
+ 
+message AppendReq {
+    string id = 1;
+    string createdAt = 2;
+    string body = 3;
+}
+
+message AppendResp {
+    bool success = 1;
+}

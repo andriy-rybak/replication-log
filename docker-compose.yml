@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+
+  leader:
+    build: './services/node'
+    ports:
+      - '${LEADER_PORT:-3000}:3000/tcp'
+      - 50051:50051/tcp
+    environment:
+      STORE_TYPE: 'IN_MEM_STORE'
+      ENV: 'development'
+      NODE_MODE: 'LEADER_NODE'
+      SERVER_PORT: 3000
+      GRPC_SERVER_PORT: 50051
+
+  follower:
+    build: './services/node'
+    scale: ${FOLLOWER_SCALE_FACTOR:-3}
+    ports:
+      - '${FOLLOWER_PORTS_RANGE:-3001-3003}:3000/tcp'
+    depends_on:
+      - leader
+    environment:
+      STORE_TYPE: 'IN_MEM_STORE'
+      ENV: 'development'
+      NODE_MODE: 'FOLLOWER_NODE'
+      SERVER_PORT: 3000
+      GRPC_SERVER_PORT: 50058
+      LEADER_GRPC_SERVER_URL: 'leader'
+      LEADER_GRPC_SERVER_PORT: 50051
+      FOLLOWER_FAKE_DEELAY: ${FOLLOWER_FAKE_DEELAY:-0}
