@@ -6,6 +6,7 @@
 * Registration should be made through a separate configuration service (zookeeper-like custom service)
 * Follower-to-Leader promotion should be added with all the consequent tactics (e.g. split-brain, etc.)
 * Any security and contract/data validation is out of scope!
+* Add randomised deelay on each separate node instance-level for better flexibility (to test distributed problem cases)
 
 ## Instructions
 ### Requirements:
