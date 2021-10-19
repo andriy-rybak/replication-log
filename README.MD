@@ -1,7 +1,7 @@
 # Replicated Log
 
-### Disclaimers
-* Registration should be made through new configuration service (e.g. zookeeper-like, etc.)
+### Notes
+* Registration should be made through a separate configuration service (e.g. zookeeper-like, etc.)
 * Follower-to-Leader promotion should be added with all the consequent tactics (e.g. split-brain, etc.)
 * Any security and contract/data validation is out of scope
 
