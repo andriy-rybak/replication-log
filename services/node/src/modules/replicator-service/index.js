@@ -33,23 +33,53 @@ class Replicator {
     return this.followers;
   }
 
-  async append(message) {
+  async append({ message, writeConcern }) {
+    // TODO rewrite to EventEmitter implementation
     try {
-      const res = await Promise.all(
-        this.followers
-          .map(async (follower) => {
-            const { client, id } = follower;
-            logger.info({ id, message }, `Replicating message to follower ${id}.`);
-            try {
-              await client.append(message);
-            } catch (error) {
-              logger.error(error, `Replication of ${message} failed to follower ${id}.`);
-            }
-            return true;
-          }),
-      );
+      logger.info({ message, writeConcern }, 'Replicating message to followers.');
+      return new Promise((resolve) => {
+        const wc = Number.isInteger(writeConcern)
+          ? Math.min(writeConcern - 1, this.followers.length)
+          : this.followers.length;
 
-      return res.reduce((result, success) => result && success, true);
+        let success = 0;
+        let fails = 0;
+
+        const conditinalResolve = () => {
+          if (success === wc) {
+            logger.info({
+              message, wc, success, fails,
+            }, `Message successfully replicated with factor ${wc + 1}.`);
+            resolve(true);
+          }
+          if (this.followers.length - fails < wc) {
+            logger.warn({
+              message, wc, success, fails,
+            }, `Message failed to be replicated with factor ${wc + 1}.`);
+            resolve(false);
+          }
+        };
+
+        const run = async (follower) => {
+          const { client, id } = follower;
+          logger.info({
+            id, message, wc, success, fails,
+          }, `Replicating message to follower ${id}.`);
+          try {
+            await client.append(message);
+            success += 1;
+          } catch (error) {
+            logger.error(error, `Replication of ${message} failed for follower ${id}.`);
+            fails += 1;
+          } finally {
+            conditinalResolve();
+          }
+        };
+
+        this.followers.forEach(run);
+
+        conditinalResolve();
+      });
     } catch (e) {
       return false;
     }

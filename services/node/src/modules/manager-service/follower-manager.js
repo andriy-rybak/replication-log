@@ -3,7 +3,9 @@ const pino = require('pino');
 const logger = pino({ name: 'Follower Manager' });
 
 async function deelay(value) {
-  return new Promise((resolve) => setTimeout(resolve, value));
+  const randVal = Math.round(Math.random() * (value));
+  logger.info({ randVal }, `Deelying request for ${randVal} ms.`);
+  return new Promise((resolve) => setTimeout(resolve, randVal));
 }
 
 class FollowerManager {
@@ -20,8 +22,8 @@ class FollowerManager {
   }
 
   async appendMessage(message) {
-    logger.debug({ message }, 'Appending message to storage.');
     await deelay(this.followerFakeDeelay);
+    logger.info({ message }, 'Appending message to storage.');
     return await this.storage.append(message);
   }
 }

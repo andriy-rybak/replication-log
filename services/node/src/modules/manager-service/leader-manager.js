@@ -15,7 +15,7 @@ class LeaderManager {
     return await this.storage.getAll();
   }
 
-  async appendMessage(body) {
+  async appendMessage({ body, writeConcern }) {
     const id = uuidv4();
     const createdAt = new Date().getTime();
     const message = {
@@ -24,15 +24,16 @@ class LeaderManager {
       createdAt,
     };
 
-    logger.info({ message }, 'Appending message to storage.');
+    logger.info({ message, writeConcern }, 'Appending message to follower storage.');
+    const replicated = await this.replicator.append({ message, writeConcern });
 
-    const replicated = await this.replicator.append(message);
     if (replicated) {
+      logger.info({ message, writeConcern }, 'Appending message to leader storage.');
       await this.storage.append(message);
       return id;
     }
 
-    return null;
+    throw new Error('Replication failed.');
   }
 }
 

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=14.17.6"
+  },
   "scripts": {
     "start": "node src/index.js",
     "start:dev": "nodemon -r dotenv/config src/index.js | pino-pretty",
@@ -11,15 +14,16 @@
   "author": "Andriy Rybak (andriy.rybak.88@fmail.com)",
   "license": "ISC",
   "dependencies": {
-    "@grpc/proto-loader": "^0.6.5",
-    "axios": "^0.23.0",
-    "express": "^4.17.1",
-    "grpc": "^1.24.11",
-    "grpc-promise": "^1.4.0",
-    "mali": "^0.45.0",
-    "pino": "^7.0.2",
-    "pino-http": "^5.8.0",
-    "uuid": "^8.3.2"
+    "@grpc/grpc-js": "1.4.3",
+    "@grpc/proto-loader": "0.6.5",
+    "axios": "0.23.0",
+    "express": "4.17.1",
+    "grpc": "1.24.11",
+    "grpc-promise": "1.4.0",
+    "mali": "0.45.0",
+    "pino": "7.0.2",
+    "pino-http": "5.8.0",
+    "uuid": "8.3.2"
   },
   "devDependencies": {
     "dotenv": "^10.0.0",
