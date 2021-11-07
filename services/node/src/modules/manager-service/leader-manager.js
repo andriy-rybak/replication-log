@@ -25,15 +25,11 @@ class LeaderManager {
     };
 
     logger.info({ message, writeConcern }, 'Appending message to follower storage.');
-    const replicated = await this.replicator.append({ message, writeConcern });
+    await this.replicator.append({ message, writeConcern });
 
-    if (replicated) {
-      logger.info({ message, writeConcern }, 'Appending message to leader storage.');
-      await this.storage.append(message);
-      return id;
-    }
-
-    throw new Error('Replication failed.');
+    logger.info({ message, writeConcern }, 'Appending message to leader storage.');
+    await this.storage.append(message);
+    return id;
   }
 }
 

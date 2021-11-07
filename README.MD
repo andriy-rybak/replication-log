@@ -3,10 +3,11 @@
 ### Notes
 * Update replication API to rely on [GRPC Stream](https://grpc.io/docs/languages/node/basics/#streaming-rpcs) (instead of regular API calls)
 * Switch to [grpc-client](https://www.npmjs.com/package/node-grpc-client) npm package (instead of the raw grpc lib)
-* Registration should be made through a separate configuration service (zookeeper-like custom service)
+* Registration/configuration service should be added.
 * Follower-to-Leader promotion should be added with all the consequent tactics (e.g. split-brain, etc.)
-* Any security and contract/data validation is out of scope!
-* Add randomised deelay on each separate node instance-level for better flexibility (to test distributed problem cases)
+* Any security and contract/data validation is out of scope! (at least for this iteration)
+* If replication factor is bigger then the cluster size or available nodes number - client receives an error response. However in case if some nodes are down and some are available - we still are trying to replicate the data - so data remains partialy replicated accross the available nodes - despite the failure status sent to client.
+* IF `docker-compose up` failed to start one of the replicas, retry the `docker-compose up` again untill it's success - sometimes(rarely) it attempts to allocate unavailable port.
 
 ## Instructions
 ### Requirements:

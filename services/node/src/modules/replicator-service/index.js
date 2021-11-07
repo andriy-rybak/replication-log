@@ -37,31 +37,34 @@ class Replicator {
     // TODO rewrite to EventEmitter implementation
     try {
       logger.info({ message, writeConcern }, 'Replicating message to followers.');
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         const wc = Number.isInteger(writeConcern)
-          ? Math.min(writeConcern - 1, this.followers.length)
+          ? writeConcern - 1
           : this.followers.length;
 
         let success = 0;
         let fails = 0;
 
-        const conditinalResolve = () => {
+        const checkStatus = () => {
           if (success === wc) {
             logger.info({
               message, wc, success, fails,
             }, `Message successfully replicated with factor ${wc + 1}.`);
             resolve(true);
+            return false;
           }
           if (this.followers.length - fails < wc) {
             logger.warn({
               message, wc, success, fails,
             }, `Message failed to be replicated with factor ${wc + 1}.`);
-            resolve(false);
+            reject();
+            return false;
           }
+
+          return true;
         };
 
-        const run = async (follower) => {
-          const { client, id } = follower;
+        const run = async ({ client, id }) => {
           logger.info({
             id, message, wc, success, fails,
           }, `Replicating message to follower ${id}.`);
@@ -72,13 +75,13 @@ class Replicator {
             logger.error(error, `Replication of ${message} failed for follower ${id}.`);
             fails += 1;
           } finally {
-            conditinalResolve();
+            checkStatus();
           }
         };
 
-        this.followers.forEach(run);
-
-        conditinalResolve();
+        if (checkStatus()) {
+          this.followers.forEach(run);
+        }
       });
     } catch (e) {
       return false;

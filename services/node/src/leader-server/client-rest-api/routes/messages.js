@@ -22,7 +22,7 @@ router.post('/messages', async (req, res) => {
     const id = await manager.appendMessage({ body, writeConcern });
     res.status(200).send({ id });
   } catch (error) {
-    res.status(500).send({ error });
+    res.status(500).send({ error: 'Replication failed' });
   }
 });
 
